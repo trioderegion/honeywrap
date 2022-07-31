@@ -1,4 +1,3 @@
-import { COMMON } from '../../common.js'
 // SPDX-License-Identifier: MIT
 // Copyright © 2021 fvtt-lib-wrapper Rui Pinheiro
 
@@ -12,22 +11,17 @@ export const VERSIONS       = [1,12,1];
 export const TGT_SPLIT_RE   = new RegExp("([^.[]+|\\[('([^'\\\\]|\\\\.)+?'|\"([^\"\\\\]|\\\\.)+?\")\\])", 'g');
 export const TGT_CLEANUP_RE = new RegExp("(^\\['|'\\]$|^\\[\"|\"\\]$)", 'g');
 
-export class LibWrapperShim {
+export class HoneyWrap {
   // Main shim code
-  static register() {
+  static register(namespaceObject, moduleName) {
     this.build();
-    COMMON.patch = (...args) => LibWrapperShim.patch(COMMON.DATA.name, ...args);
+    namespaceObject.patch = (target, patches) => HoneyWrap.patch(moduleName, target, patches);
   }
 
   static patch(moduleName, target, patches) {
 
     Object.entries(patches).forEach( ([fn, override]) => {
-      const original = Object.getOwnPropertyDescriptor(getProperty(globalThis, target), fn)
-      if (original) {
-        libWrapper.register(moduleName, `${target}.${fn}`, override.value, override.mode);
-      } else {
-        Object.defineProperty(getProperty(globalThis, target), fn, override);
-      }
+      libWrapper.register(moduleName, `${target}.${fn}`, override.value, override.mode);
     }) 
 
   }
