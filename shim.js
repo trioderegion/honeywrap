@@ -1,4 +1,3 @@
-import { COMMON } from '../../common.js'
 // SPDX-License-Identifier: MIT
 // Copyright © 2021 fvtt-lib-wrapper Rui Pinheiro
 
@@ -16,7 +15,9 @@ export class LibWrapperShim {
   // Main shim code
   static register() {
     this.build();
-    COMMON.patch = (...args) => LibWrapperShim.patch(COMMON.DATA.name, ...args);
+
+    return LibWrapperShim.patch; 
+    //COMMON.patch = (...args) => LibWrapperShim.patch(COMMON.DATA.name, ...args);
   }
 
   static patch(moduleName, target, patches) {
