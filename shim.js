@@ -12,6 +12,15 @@ export const TGT_SPLIT_RE   = new RegExp("([^.[]+|\\[('([^'\\\\]|\\\\.)+?'|\"([^
 export const TGT_CLEANUP_RE = new RegExp("(^\\['|'\\]$|^\\[\"|\"\\]$)", 'g');
 
 export class LibWrapperShim {
+  static #getField(path, parent = globalThis) {
+    const parts = path.split('.');
+    const field = parts.reduce( (acc, curr) => {
+      return acc ? acc[curr] : null;
+    }, parent);
+
+    return field;
+  }
+
   // Main shim code
   static register() {
     this.build();
@@ -23,7 +32,7 @@ export class LibWrapperShim {
   static patch(moduleName, target, patches) {
 
     Object.entries(patches).forEach( ([fn, override]) => {
-      const original = Object.getOwnPropertyDescriptor(getProperty(globalThis, target), fn)
+      const original = Object.getOwnPropertyDescriptor(LibWrapperShim.#getField(target), fn)
       if (original) {
         libWrapper.register(moduleName, `${target}.${fn}`, override.value, override.mode);
       } else {
